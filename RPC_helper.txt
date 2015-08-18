@@ -1,1 +1,13 @@
-test
+REGTEST commands :
+
+=> starting :
+bitcoind -regtest -daemon 
+
+=> closing :
+bitcoin-cli -regtest stop
+
+=> all commands :
+bitcoin-cli -regtest + bitcoin core RPC 
+
+=> clean the mess :
+delete/move ~/.bitcoin/regtest
