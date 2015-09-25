@@ -29,22 +29,48 @@ class Message():
 
     def FillPackets(self):
         """Fill the packets list with strings of size msg_size"""
-        reader = open( self.path , "r")
-        tmp = reader.readlines()
         buff = ""
-        place = self.msg_size
+        buff_free_space = self.msg_size
 
-        for s in tmp:
-            if( len(s) >=  place ):
-                buff += s[0:place]
-                place = 0 
-            else :
+        reader = open( self.path , "r")
+        for s in reader:
+            str_len = len(s)
+            ed = len(s)
+            if( buff_free_space > str_len ):
                 buff += s
-                place -= len(s)
-            if( place == 0):
-                self.packets.append(buff)
-                buff = ""
-                place = self.msg_size
+                buff_free_space -= str_len
+            else:
+                pos = 0
+                pos1 = 0
+                while str_len > 0:
+                    pos1 = min( pos + buff_free_space , ed )
+                    #print(" pos : " + str(pos) + " , pos1 : " + str(pos1) )
+                    buff += s[pos : pos1 ]
+                    buff_free_space -= pos1 - pos
+                    str_len -= pos1 -pos 
+                    pos = pos1
+                    
+                    if( buff_free_space == 0 ):
+                        self.packets.append( buff )
+                        buff = ""
+                        buff_free_space = self.msg_size
+        reader.close()
+
+    def Rebuild(self):
+        output = ""
+        for s in self.packets:
+            output += s
+        print( output )
+
+
+           
+
+
+    def Print_all(self):
+        i = 0
+        for s in self.packets:
+            print( str(i)+ " : "  + s )
+            i += 1
 
 
 def main():
@@ -64,3 +90,11 @@ main()
 x = TestUser()
 x.print_key()
 x.set_addresses()
+
+
+m = Message("test.txt" , 30 )
+m.FillPackets()
+m.Print_all()
+
+print(" ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ")
+m.Rebuild()
