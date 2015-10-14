@@ -7,7 +7,6 @@ import sys
 #This will be used as a basis for ledging and broker apps
 
 class Server(threading.Thread):
-
     def __init__(self, id_ , name ):
         super().__init__()
         self.id_ = id_
@@ -18,13 +17,13 @@ class Server(threading.Thread):
     def CreateSockets(self):
         self.sock = socket.socket( socket.AF_INET , socket.SOCK_STREAM )
         self.host = ''
-        self.port = 7004 + self.id_ 
+        self.port = 7004 
         self.sock.bind( (self.host , self.port) )
         self.sock.listen(10)
         print( self.host )
         print( self.port )
 
-    def Run(self):
+    def run(self):
         self.Listening()
 
     def Listening(self):
@@ -38,10 +37,9 @@ class Server(threading.Thread):
 
     def ManageConnection(self):
         for con in self.connections_list :
-            con.Run()
+            con.start()
 
 class SConnection(threading.Thread):
-
     def __init__(self, addr , connection ):
         super().__init__()
         self.addr = addr
@@ -49,14 +47,14 @@ class SConnection(threading.Thread):
         self.data = []
         self.size_max = 20
 
-    def Run(self):
+    def run(self):
         self.ReceiveData()
 
     def ReceiveData(self):
         while True:
             tmp_data = self.connection.recv(4096).decode("utf-8")
             self.AddToData( tmp_data)
-            print( self.data )
+            #print( self.data )
 
     def AddToData(self, word ):
         if( len( self.data ) < self.size_max ):
@@ -65,11 +63,27 @@ class SConnection(threading.Thread):
             self.data = self.data[1:]
             self.data.append( word )
 
+###################################################################################################
 
 class Client(threading.Thread):
-    def __init__(self, id_ , name ):
+    def __init__(self, id_ , name , target):
+        super().__init__()
         self.id_ = id_
         self.name = name
+        self.target = target
+        self.target = ''
+
+    def createSocket(self):
+        print("bitch")
+        self.sock = socket.socket( socket.AF_INET , socket.SOCK_STREAM )
+        self.port = 7004
+        self.sock.connect( ( self.target, self.port ) )
+        self.sock.send( b"ppd" )
+
+    def run(self):
+        self.createSocket()
+
+###################################################################################################
 
 class Manager(threading.Thread):
     def __init__(self, id_ , name ):
@@ -78,7 +92,10 @@ class Manager(threading.Thread):
 
 def main():
     serv =  Server( 2 , "roger" )
-    serv.Run()
+    client = Client( 2, "test" , '' )
+    serv.start()
+    client.start()
+
 
 
 if __name__ == "__main__":
