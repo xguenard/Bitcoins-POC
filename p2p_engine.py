@@ -32,12 +32,16 @@ class Server(threading.Thread):
             connection , addr  = self.sock.accept()
             print(" connected with : " + addr[ 0] + " : " + str( addr[1] ) )
             self.connections_list.append( SConnection( addr , connection ))
-            self.ManageConnection()
+            self.StartLastConnection()
         self.sock.close()
 
     def ManageConnection(self):
         for con in self.connections_list :
             con.start()
+
+    def StartLastConnection(self):
+        self.connections_list[-1].setDaemon(True)
+        self.connections_list[-1].start()
 
 class SConnection(threading.Thread):
     def __init__(self, addr , connection ):
@@ -53,10 +57,11 @@ class SConnection(threading.Thread):
     def ReceiveData(self):
         while True:
             tmp_data = self.connection.recv(4096).decode("utf-8")
-            self.AddToData( tmp_data)
-            #print( self.data )
+            if tmp_data:
+                self.AddToData( tmp_data)
 
     def AddToData(self, word ):
+        print( word )
         if( len( self.data ) < self.size_max ):
             self.data.append( word )
         else:
@@ -92,6 +97,7 @@ class Manager(threading.Thread):
 
 def main():
     serv =  Server( 2 , "roger" )
+    
     client = Client( 2, "test" , '' )
     serv.start()
     client.start()
