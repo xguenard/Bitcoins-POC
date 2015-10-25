@@ -15,7 +15,6 @@ class ServerView(QtGui.QDialog):
         layout = QtGui.QVBoxLayout()
         layout.addWidget( self.listView )
         self.setLayout( layout )
-        self.show()
 
 class ListModel(QtCore.QAbstractListModel):
     def __init__(self):
@@ -124,7 +123,6 @@ class ClientView(QtGui.QDialog):
 
         self.connect( self.lineedit, QtCore.SIGNAL("returnPressed()"), self.updateui )
         self.setLayout( layout )
-        self.show()
 
     def updatedata( self ):
         msg = self.lineedit.text()
@@ -187,19 +185,31 @@ class Client():
 
 ###################################################################################################
 
-class Manager(threading.Thread):
-    def __init__(self, id_ , name ):
-        self.id_ = id_
-        self.name = name
+class MainWindow(QtGui.QWidget):
+    def __init__(self, serv_view , cli_view ):
+        super().__init__()
+        print("ici")
+        self.serv_view = serv_view
+        self.cli_view = cli_view
+        self.initUI()
+
+    def initUI(self):
+        self.setGeometry( 400,400, 400, 400 )
+        layout = QtGui.QHBoxLayout()
+        layout.addWidget( self.cli_view )
+        layout.addWidget( self.serv_view )
+        self.setLayout( layout )
+        self.show()
 
 def main():
     app = QtGui.QApplication(sys.argv)
     serv =  ServerManager( 2 , "roger" )
     serv_view = ServerView( serv.GetModel() )
-    targ_list = [ ["", 7004] ]
+    targ_list = [ ["",7004 ] ]
     serv.start()
     clis = ClientsManager( targ_list )
     cli_view = ClientView( clis.GetModel() , clis )
+    wind =  MainWindow( serv_view , cli_view) 
     app.exec_()
 
 
