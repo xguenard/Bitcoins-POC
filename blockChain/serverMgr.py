@@ -31,8 +31,12 @@ class ServerManager(threading.Thread):
             print("waiting for connections")
             connection , addr  = self.sock.accept()
             print(" connected with : " + addr[ 0] + " : " + str( addr[1] ) )
-            self.connections_list.append( connectionMgr.SConnection( addr , connection, self.consensus ))
+
+            self.connections_list.append( connectionMgr.SConnection( 
+                addr , connection, self.consensus ))
+
             self.StartLastConnection()
+
         self.sock.close()
 
     def StartLastConnection(self):
