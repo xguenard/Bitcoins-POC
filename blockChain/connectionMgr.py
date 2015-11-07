@@ -24,8 +24,6 @@ class SConnection(threading.Thread):
     def AddToData(self, word ):
         self.consensus.addElem( word )
 
-
-
 class ConnectionManager():
     def __init__(self):
         self.conn_dict = {}
@@ -40,8 +38,8 @@ class ConnectionManager():
             self.addr_set.add( addr )
         else:
             print("Red Listed connection from : " + addr )
-
-   def SendAll( self, message , sending_addr):
+    
+    def SendAll( self, message , sending_addr):
        """To do, improve by adding all the other nodes"""
        for addr, conn in self.conn_dict.iteritems():
            if addr != sending_addr :
