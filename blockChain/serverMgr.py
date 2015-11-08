@@ -21,7 +21,7 @@ class ServerManager(threading.Thread):
         self.host = ''
         self.port = 7004 
         self.sock.bind( (self.host , self.port) )
-        self.sock.listen(10)
+        self.sock.listen(5)
 
     def run(self):
         self.Listening()
@@ -43,4 +43,43 @@ class ServerManager(threading.Thread):
         self.connections_list[-1].setDaemon(True)
         self.connections_list[-1].start()
 
+
+
+class PeersManager:
+    def __init__(self):
+        self.active_peers = {}
+        self.unactive_peers = set()
+        self.peers_list = set()
+        self.max_peers = 10
+
+    def AddPeer(self, conn = None , addr = '' , port = '' ):
+        if conn != None:
+            self.active_peers[ ( addr, port ) ] = conn
+        else:
+            self.peers_list.add( (addr, port ) ]
+
+
+    def sendAll( self , msg ):
+        for key, conn in self.active_peers.items:
+            try:
+                conn.sendall( msg.encode("utf-8"))
+            except:
+                del self.active_peers[ key ]
+                self.unactive_peers.add( key )
+
+class Peer(Threading.Thread):
+    def __init__(self, addr, port, conn):
+        super().__init__()
+        self.addr = addr
+        self.port = port
+        self.conn = conn
+
+
+            
+
+
+
+class Consensus:
+    def Validate(self, arg):
+        pass
 

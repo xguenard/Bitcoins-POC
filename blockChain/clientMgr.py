@@ -31,6 +31,3 @@ class ClientsManager():
             thr.start()
         for thr in self.thread_list:
             thr.join()
-
-
-
