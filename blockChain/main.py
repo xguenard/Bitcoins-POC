@@ -4,22 +4,32 @@ from PySide import QtGui, QtCore
 import sys
 import dataModels
 import mainGui
-import clientMgr
 import serverMgr
-import dataMgr
+import peersMgr
 
 #Goal = create a simple p2p protocol.
 #This will be used as a basis for ledging and broker apps
 
 def main():
+    #Init Graphical env
     app = QtGui.QApplication(sys.argv)
-    serv =  serverMgr.ServerManager( 2 , "roger" )
-    serv_view = mainGui.ServerView( serv.GetModel() )
-    targ_list = [ ["",7004 ] ]
+
+    #Init Peer Manager
+    peer_mgr = peersMgr.PeersManager()
+    peer_mgr.start()
+
+    #Init server 
+    serv =  serverMgr.ServerManager( peer_mgr.GetPeerQ() )
     serv.start()
-    clis = clientMgr.ClientsManager( targ_list )
-    cli_view = mainGui.ClientView( clis.GetModel() , clis )
-    wind =  mainGui.MainWindow( serv_view , cli_view) 
+
+    #Init server View
+    serv_view = mainGui.ServerView( peer_mgr.GetDataVis() )
+
+    #Init Client view
+    cli_view = mainGui.ClientView( peer_mgr.GetMessQ() , dataModels.ListModel() )
+
+    #Init and Launch Main View
+    wind =  mainGui.MainWindow( serv_view , cli_view ) 
     app.exec_()
 
 

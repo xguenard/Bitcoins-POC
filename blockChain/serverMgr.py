@@ -1,23 +1,18 @@
 import threading
-import dataMgr
 import socket
-import connectionMgr
+import peersMgr
+import queue
 
 
 class ServerManager(threading.Thread):
-    def __init__(self, id_ , name):
+    def __init__(self, peer_queue):
         super().__init__()
-        self.id_ = id_
-        self.name = name
-        self.consensus = dataMgr.ConsensusContainer()
+        self.peer_queue = peer_queue
         self.CreateSockets()
-        self.connections_list = []
-
-    def GetModel(self):
-        return self.consensus.model
 
     def CreateSockets(self):
         self.sock = socket.socket( socket.AF_INET , socket.SOCK_STREAM )
+        self.sock.setsockopt( socket.SOL_SOCKET , socket.SO_REUSEADDR , 1 )
         self.host = ''
         self.port = 7004 
         self.sock.bind( (self.host , self.port) )
@@ -31,15 +26,7 @@ class ServerManager(threading.Thread):
             print("waiting for connections")
             connection , addr  = self.sock.accept()
             print(" connected with : " + addr[ 0] + " : " + str( addr[1] ) )
-
-            self.connections_list.append( connectionMgr.SConnection( 
-                addr , connection, self.consensus ))
-
-            self.StartLastConnection()
+            connection.setblocking(0)
+            self.peer_queue.put( connection )
 
         self.sock.close()
-
-    def StartLastConnection(self):
-        self.connections_list[-1].setDaemon(True)
-        self.connections_list[-1].start()
-

@@ -1,8 +1,5 @@
 import dataModels
 
-
-
-
 class ConsensusContainer():
     def __init__(self):
         self.model = dataModels.ListModel()

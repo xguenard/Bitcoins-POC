@@ -13,10 +13,10 @@ class ServerView(QtGui.QDialog):
         self.setLayout( layout )
 
 class ClientView(QtGui.QDialog):
-    def __init__(self, model, cli_manager ):
+    def __init__(self,  msg_q , model):
         super().__init__()
         self.model = model
-        self.cli_manager = cli_manager
+        self.msg_q = msg_q
         self.listview = QtGui.QListView()
         self.listview.setModel( self.model)
         self.lineedit = QtGui.QLineEdit("entrer message ici :" )
@@ -31,7 +31,7 @@ class ClientView(QtGui.QDialog):
     def updatedata( self ):
         msg = self.lineedit.text()
         self.lineedit.setText("")
-        self.cli_manager.sendAll( msg )
+        self.msg_q.put( msg )
 
     def updateui( self ):
         self.updatedata()
