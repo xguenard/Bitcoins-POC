@@ -8,7 +8,7 @@ class ConsensusContainer():
         self.model.addElem( msg )
 
 
-class ClientContainer():
+class MetaContainer():
     def __init__(self):
         self.model = dataModels.ListModel()
 

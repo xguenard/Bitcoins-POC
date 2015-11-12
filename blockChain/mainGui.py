@@ -2,7 +2,7 @@ from PySide import QtGui, QtCore
 
 
 
-class ServerView(QtGui.QDialog):
+class ConsenusView(QtGui.QDialog):
     def __init__(self , model):
         super().__init__()
         self.model = model
@@ -12,7 +12,7 @@ class ServerView(QtGui.QDialog):
         layout.addWidget( self.listView )
         self.setLayout( layout )
 
-class ClientView(QtGui.QDialog):
+class MetaDataView(QtGui.QDialog):
     def __init__(self,  msg_q , model):
         super().__init__()
         self.model = model
@@ -37,17 +37,16 @@ class ClientView(QtGui.QDialog):
         self.updatedata()
 
 class MainWindow(QtGui.QWidget):
-    def __init__(self, serv_view , cli_view ):
+    def __init__(self, cons_view , meta_view ):
         super().__init__()
-        print("ici")
-        self.serv_view = serv_view
-        self.cli_view = cli_view
+        self.cons_view = cons_view
+        self.meta_view = meta_view
         self.initUI()
 
     def initUI(self):
         self.setGeometry( 400,400, 400, 400 )
         layout = QtGui.QHBoxLayout()
-        layout.addWidget( self.cli_view )
-        layout.addWidget( self.serv_view )
+        layout.addWidget( self.cons_view )
+        layout.addWidget( self.meta_view )
         self.setLayout( layout )
         self.show()

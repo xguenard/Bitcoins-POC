@@ -27,6 +27,6 @@ class ServerManager(threading.Thread):
             connection , addr  = self.sock.accept()
             print(" connected with : " + addr[ 0] + " : " + str( addr[1] ) )
             connection.setblocking(0)
-            self.peer_queue.put( connection )
+            self.peer_queue.put( ( connection , addr )  )
 
         self.sock.close()

@@ -7,7 +7,7 @@ class ListModel(QtCore.QAbstractListModel):
 
     def __init__(self):
         super().__init__()
-        self.data_list = ["one", "two"]
+        self.data_list = []
 
     def rowCount(self , index = QtCore.QModelIndex()):
         return len( self.data_list )

@@ -22,14 +22,14 @@ def main():
     serv =  serverMgr.ServerManager( peer_mgr.GetPeerQ() )
     serv.start()
 
-    #Init server View
-    serv_view = mainGui.ServerView( peer_mgr.GetDataVis() )
+    #Init consensu View
+    cons_view = mainGui.ConsenusView( peer_mgr.GetDataVis() )
 
     #Init Client view
-    cli_view = mainGui.ClientView( peer_mgr.GetMessQ() , dataModels.ListModel() )
+    meta_view = mainGui.MetaDataView( peer_mgr.GetMessQ() , peer_mgr.GetMetaVis() )
 
     #Init and Launch Main View
-    wind =  mainGui.MainWindow( serv_view , cli_view ) 
+    wind =  mainGui.MainWindow( cons_view , meta_view ) 
     app.exec_()
 
 
