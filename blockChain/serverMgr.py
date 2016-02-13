@@ -5,10 +5,14 @@ import queue
 
 
 class ServerManager(threading.Thread):
+    """
+        Server side class, listen to new connection
+    """
     def __init__(self, peer_queue):
         super().__init__()
         self.peer_queue = peer_queue
         self.CreateSockets()
+        self.stop_listen = False 
 
     def CreateSockets(self):
         self.sock = socket.socket( socket.AF_INET , socket.SOCK_STREAM )
@@ -22,7 +26,7 @@ class ServerManager(threading.Thread):
         self.Listening()
 
     def Listening(self):
-        while True:
+        while True and not self.stop_listen:
             print("waiting for connections")
             connection , addr  = self.sock.accept()
             print(" connected with : " + addr[ 0] + " : " + str( addr[1] ) )

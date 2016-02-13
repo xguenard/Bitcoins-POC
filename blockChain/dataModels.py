@@ -1,9 +1,9 @@
 from PySide import QtCore
 
-
-
 class ListModel(QtCore.QAbstractListModel):
-    """Model used to keep Gui updated with our data"""
+    """
+        Model used to keep Gui updated with our data
+    """
 
     def __init__(self):
         super().__init__()
@@ -21,4 +21,5 @@ class ListModel(QtCore.QAbstractListModel):
     def addElem( self, msg ):
         self.data_list.append( msg )
         index = self.createIndex( len( self.data_list) -1 , 0  )
-        self.emit(QtCore.SIGNAL("dataChanged(QModelIndex, QModelIndex )"), index , index )
+        self.emit(QtCore.SIGNAL("dataChanged(QModelIndex, QModelIndex )")\
+                , index , index )

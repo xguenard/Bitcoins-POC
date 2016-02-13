@@ -25,7 +25,8 @@ class MetaDataView(QtGui.QDialog):
         layout.addWidget( self.listview )
         layout.addWidget( self.lineedit )
 
-        self.connect( self.lineedit, QtCore.SIGNAL("returnPressed()"), self.updateui )
+        self.connect( self.lineedit, QtCore.SIGNAL("returnPressed()")\
+                , self.updateui )
         self.setLayout( layout )
 
     def updatedata( self ):
