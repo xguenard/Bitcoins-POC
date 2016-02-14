@@ -13,6 +13,10 @@ import consensus
 #This will be used as a basis for ledging and broker apps
 
 def main():
+    #For test only, ask for the port
+
+    port =int(input("Enter port number\n"))
+    port2 =int(input("port to connect\n"))
     #Init Graphical env
     app = QtGui.QApplication(sys.argv)
     
@@ -25,7 +29,8 @@ def main():
     peer_mgr.start()
 
     #Init server 
-    serv =  serverMgr.ServerManager( peer_mgr.get_peer_Q(), meta )
+    serv =  serverMgr.ServerManager(peer_mgr.get_peer_Q(), meta, port)
+    serv.new_peers_queue.put( ('' , port2))
     serv.start()
 
     #Init consensu View

@@ -46,7 +46,7 @@ class PeersManager(threading.Thread):
                     "Sending a message '{}' to {} connected peers".format(msg, self.number_peers))
   
             for peer in writable_peers:
-                peer.send(msg.encode("utf-8"))
+                r=peer.send(msg.encode("utf-8"))
             self.message_queue.task_done()
 
     def read(self, peer ):
@@ -55,9 +55,11 @@ class PeersManager(threading.Thread):
         """
         data = peer.recv(4096)
         if data:
-            self.consensus.Add( data[:-2].decode("utf-8") )
+            self.consensus.add( data[:-2].decode("utf-8") )
+            return True
         else:
             peer.close()
+            return False
 
 
     def run(self):
@@ -65,22 +67,16 @@ class PeersManager(threading.Thread):
             Peer management using select
         """
         while True:
-            print("Processing loop")
+            #print("Processing loop")
             self.process_peer_Q()
-
-            readable, writable, execptions = select.select(self.active_peers \
-                    , self.active_peers , [], 0.2)
-
+            if( self.active_peers ):
+                readable, writable, execptions = select.select( self.active_peers
+                        , [] , [], 0.2)
             #Read data
-            for r in readable :
-                self.read(r)
-
+                for r in readable :
+                    self.read(r)
             #Write data
-            self.process_message_Q(writable)
-
-            #exceptions
-            for e in execptions :
-                print(e)
+                self.process_message_Q(self.active_peers)
 
     #Getters methods for GUI and stuff
     def get_peer_Q(self):
