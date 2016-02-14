@@ -8,24 +8,22 @@ class Consensus:
     """
     def __init__(self):
         self.vis_data = dataMgr.ConsensusContainer()
-        self.meta_data = dataMgr.MetaContainer()
         self.peer_set = set()
 
-    def AddPeer(self, name ):
+    def add_peer(self, name ):
         if not name in self.peer_set:
-            if self.VerifyPeer( name ):
+            if self.verify_peer( name ):
                 self.peer_set.add( name )
-                self.meta_data.addElem( name )
 
-    def Add(self, message):
+    def add(self, message):
         """
             No verification for the moment
         """
-        if self.VerifyMessage( message ):
+        if self.verify_message( message ):
             self.vis_data.addElem( message )
 
-    def VerifyMessage( self, message ):
+    def verify_message( self, message ):
         return True
 
-    def VerifyPeer( self, name ):
+    def verify_peer( self, name ):
         return True

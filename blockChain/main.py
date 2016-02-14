@@ -6,6 +6,8 @@ import dataModels
 import mainGui
 import serverMgr
 import peersMgr
+import dataMgr
+import consensus
 
 #Goal = create a simple p2p protocol.
 #This will be used as a basis for ledging and broker apps
@@ -13,20 +15,24 @@ import peersMgr
 def main():
     #Init Graphical env
     app = QtGui.QApplication(sys.argv)
+    
+    #Init data containers for GUI
+    meta , net = dataMgr.CreateContainers()
+    cons = consensus.Consensus()
 
     #Init Peer Manager
-    peer_mgr = peersMgr.PeersManager()
+    peer_mgr = peersMgr.PeersManager( cons, meta)
     peer_mgr.start()
 
     #Init server 
-    serv =  serverMgr.ServerManager( peer_mgr.GetPeerQ() )
+    serv =  serverMgr.ServerManager( peer_mgr.get_peer_Q(), meta )
     serv.start()
 
     #Init consensu View
-    cons_view = mainGui.ConsenusView( peer_mgr.GetDataVis() )
+    cons_view = mainGui.ConsenusView( cons.vis_data.model )
 
     #Init Client view
-    meta_view = mainGui.MetaDataView( peer_mgr.GetMessQ() , peer_mgr.GetMetaVis() )
+    meta_view = mainGui.MetaDataView( peer_mgr.get_mess_Q() , meta.model )
 
     #Init and Launch Main View
     wind =  mainGui.MainWindow( cons_view , meta_view ) 

@@ -8,11 +8,12 @@ class ServerManager(threading.Thread):
     """
         Server side class, listen to new connection
     """
-    def __init__(self, peer_queue):
+    def __init__(self, peer_queue , meta):
         super().__init__()
         self.peer_queue = peer_queue
         self.CreateSockets()
         self.stop_listen = False 
+        self.metas = meta
 
     def CreateSockets(self):
         self.sock = socket.socket( socket.AF_INET , socket.SOCK_STREAM )

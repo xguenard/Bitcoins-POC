@@ -1,5 +1,13 @@
 import dataModels
 
+
+
+
+
+def CreateContainers():
+    return MetaContainer() , NetworkContainer()
+   
+
 class ConsensusContainer():
     """
         Contains data of the consensus informations
@@ -14,13 +22,19 @@ class ConsensusContainer():
 
 class MetaContainer():
     """
-        Should print data about the peers connected on the network
-        - Actually used to print what I am wrinting
+        Should print data about the application, if a peers is correctly added to the
+        network for example
     """
     def __init__(self):
         self.model = dataModels.ListModel()
 
-    def addElem(self, msg ):
+    def add(self, msg ):
         self.model.addElem( msg )
+
+
+class NetworkContainer():
+
+    def __init__(self):
+        self.model = dataModels.ListModel()
 
 

@@ -14,37 +14,42 @@ class PeersManager(threading.Thread):
         - listenning to all active peers
     """
 
-    def __init__(self):
+    def __init__(self, cons , meta):
         super().__init__()
         self.peer_queue = queue.Queue()             #Peers newly connnected to the server
         self.message_queue = queue.Queue()          #Messages that I want to send to the others
-        self.consensus = consensus.Consensus()      #Consensus, check all data and peers received
+        self.consensus = cons                    #Consensus, check all data and peers received
+        self.metas_infos = meta
         self.active_peers = []                      #Active peer = active connection
         self.max_peers = 10
         self.number_peers = 0
 
-    def ProcessPeerQ(self):
+    def process_peer_Q(self):
         """
             Adding peers received from the server side to the active peer list
         """
         while not self.peer_queue.empty() and self.number_peers <= self.max_peers:
             peer, addr = self.peer_queue.get()
-            self.consensus.AddPeer( str(addr[0]) + "@" + str(addr[1]) )
+            self.consensus.add_peer(str(addr[0]) + "@" + str(addr[1]))
             self.active_peers.append( peer )
             self.number_peers += 1
             self.peer_queue.task_done()
 
-    def ProcessMessageQ(self, writable_peers ):
+    def process_message_Q(self, writable_peers ):
         """
             Processing the message queue, sending messages to all the peers
         """
         while not self.message_queue.empty():
             msg = self.message_queue.get()
-            self.consensus.Add( msg )
+            self.consensus.add(msg)
+            self.metas_infos.add( \
+                    "Sending a message '{}' to {} connected peers".format(msg, self.number_peers))
+  
             for peer in writable_peers:
-                peer.send(msg.encode("utf-8") )
+                peer.send(msg.encode("utf-8"))
             self.message_queue.task_done()
-    def Read(self, peer ):
+
+    def read(self, peer ):
         """
             Read the data received from an active peer
         """
@@ -59,34 +64,36 @@ class PeersManager(threading.Thread):
         """
             Peer management using select
         """
-
         while True:
             print("Processing loop")
-            self.ProcessPeerQ()
+            self.process_peer_Q()
 
-            readable, writable, execptions = select.select( self.active_peers \
-                    , self.active_peers , [], 0.2 )
+            readable, writable, execptions = select.select(self.active_peers \
+                    , self.active_peers , [], 0.2)
 
             #Read data
             for r in readable :
-                self.Read( r )
+                self.read(r)
 
             #Write data
-            self.ProcessMessageQ( writable )
+            self.process_message_Q(writable)
 
             #exceptions
             for e in execptions :
-                print( e )
+                print(e)
 
     #Getters methods for GUI and stuff
-    def GetPeerQ(self):
+    def get_peer_Q(self):
         return self.peer_queue
-    def GetMessQ(self):
+
+    def get_mess_Q(self):
         return self.message_queue
-    def GetDataVis(self):
+
+    def get_data_vis(self):
         return self.consensus.vis_data.model
-    def GetMetaVis(self):
-        return self.consensus.meta_data.model
+
+    def get_meta_vis(self):
+        return self.metas_infos.meta_data.model
     
     
 class PeersManagerTest(unittest.TestCase):
