@@ -3,6 +3,7 @@ import select
 import threading
 import consensus
 import unittest
+import time
 
 class PeersManager(threading.Thread):
     """
@@ -16,23 +17,29 @@ class PeersManager(threading.Thread):
 
     def __init__(self, cons , meta):
         super().__init__()
-        self.peer_queue = queue.Queue()             #Peers newly connnected to the server
-        self.message_queue = queue.Queue()          #Messages that I want to send to the others
-        self.consensus = cons                    #Consensus, check all data and peers received
+        #Peers newly connnected to the server
+        self.peer_queue = queue.Queue()  
+        #Messages that I want to send to the others
+        self.message_queue = queue.Queue()
+        #Consensus, check all data and peers received
+        self.consensus = cons
         self.metas_infos = meta
-        self.active_peers = []                      #Active peer = active connection
+        #Active peer = active connection
+        self.active_peers = []
         self.max_peers = 10
         self.number_peers = 0
 
     def process_peer_Q(self):
         """
-            Adding peers received from the server side to the active peer list
+            Adding peers received from the server 
+            side to the active peer list
         """
-        while not self.peer_queue.empty() and self.number_peers <= self.max_peers:
+        while not self.peer_queue.empty() \
+                and len(self.active_peers) <= self.max_peers:
+
             peer, addr = self.peer_queue.get()
             self.consensus.add_peer(str(addr[0]) + "@" + str(addr[1]))
             self.active_peers.append( peer )
-            self.number_peers += 1
             self.peer_queue.task_done()
 
     def process_message_Q(self, writable_peers ):
@@ -43,7 +50,8 @@ class PeersManager(threading.Thread):
             msg = self.message_queue.get()
             self.consensus.add(msg)
             self.metas_infos.add( \
-                    "Sending a message '{}' to {} connected peers".format(msg, self.number_peers))
+                    "Sending a message '{}' to {} connected peers".format(\
+                    msg, len(self.active_peers)))
   
             for peer in writable_peers:
                 r=peer.send(msg.encode("utf-8"))
@@ -51,7 +59,8 @@ class PeersManager(threading.Thread):
 
     def read(self, peer ):
         """
-            Read the data received from an active peer
+            Read the data received from an active peer.
+            It may be a closing message.
         """
         data = peer.recv(4096)
         if data:
@@ -61,22 +70,26 @@ class PeersManager(threading.Thread):
             peer.close()
             return False
 
-
     def run(self):
         """
             Peer management using select
         """
         while True:
             #print("Processing loop")
+            time.sleep(0.1)
             self.process_peer_Q()
             if( self.active_peers ):
-                readable, writable, execptions = select.select( self.active_peers
-                        , [] , [], 0.2)
-            #Read data
+                readable, writable, execptions = select.select(\
+                        self.active_peers, self.active_peers, [], 0.2)
+                #Read data
                 for r in readable :
-                    self.read(r)
+                    if not self.read(r):
+                        self.active_peers.remove(r)
+
+                self.process_message_Q(writable)
+            else:
+                time.sleep(0.2)
             #Write data
-                self.process_message_Q(self.active_peers)
 
     #Getters methods for GUI and stuff
     def get_peer_Q(self):

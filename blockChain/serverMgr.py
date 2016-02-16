@@ -11,7 +11,6 @@ class ServerManager(threading.Thread):
     def __init__(self, peer_queue , meta, port): 
         super().__init__()
         self.peer_queue = peer_queue
-        self.new_peers_queue = queue.Queue()
         self.port = port
         self.create_sockets()
         self.stop_listen = False 
@@ -29,7 +28,6 @@ class ServerManager(threading.Thread):
 
     def listening(self):
         while True and not self.stop_listen:
-            self.process_new_peers_Q()
             print("waiting for connections")
             connection , addr  = self.sock.accept()
             print(" connected with : " + addr[0] + " : " + str(addr[1]))
@@ -40,11 +38,10 @@ class ServerManager(threading.Thread):
 
         self.sock.close()
 
-    def process_new_peers_Q(self):
-        while not self.new_peers_queue.empty():
-            tcp_ip, port = self.new_peers_queue.get()
-            self.create_peer(tcp_ip, port)
-            self.new_peers_queue.task_done()
+class PeerCreator:
+    def __init__(self, peer_queue, meta):
+        self.peer_queue = peer_queue
+        self.metas_info = meta
 
     def create_peer(self, tcp_ip, port):
         try:
@@ -52,7 +49,8 @@ class ServerManager(threading.Thread):
             new_sock.connect((tcp_ip, port))
             new_sock.setblocking(0)
         except socket.error as e:
-            self.metas_info.add( "failed trying to connect to {} at {}.".format(\
+            self.metas_info.add(\
+                    "failed trying to connect to {} at {}.".format(\
                     tcp_ip, port))
             return
         self.peer_queue.put((new_sock, (tcp_ip, port)))
