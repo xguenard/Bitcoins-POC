@@ -1,7 +1,6 @@
 import queue
 import dataMgr
 
-
 class Consensus:
     """
         Future crypto structure for validation and algorithms test
@@ -27,3 +26,4 @@ class Consensus:
 
     def verify_peer( self, name ):
         return True
+

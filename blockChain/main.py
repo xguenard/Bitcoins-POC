@@ -29,7 +29,7 @@ def main():
     #Init server 
     serv =  serverMgr.ServerManager(peer_mgr.get_peer_Q(), meta, port)
     serv.start()
-
+    
     peer_creator = serverMgr.PeerCreator(peer_mgr.get_peer_Q(), meta)
 
     #Init GUI

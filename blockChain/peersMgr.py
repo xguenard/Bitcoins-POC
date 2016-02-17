@@ -64,7 +64,7 @@ class PeersManager(threading.Thread):
         """
         data = peer.recv(4096)
         if data:
-            self.consensus.add( data[:-2].decode("utf-8") )
+            self.consensus.add( data.decode("utf-8") )
             return True
         else:
             peer.close()
