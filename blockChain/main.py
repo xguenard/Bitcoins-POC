@@ -2,7 +2,6 @@ import socket
 import threading
 from PySide import QtGui, QtCore
 import sys
-import dataModels
 import mainGui
 import serverMgr
 import peersMgr

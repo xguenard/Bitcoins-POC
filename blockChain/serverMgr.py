@@ -46,6 +46,7 @@ class PeerCreator:
     def create_peer(self, tcp_ip, port):
         try:
             new_sock = socket.socket( socket.AF_INET , socket.SOCK_STREAM )
+            new_sock.settimeout(10)
             new_sock.connect((tcp_ip, port))
             new_sock.setblocking(0)
         except socket.error as e:
