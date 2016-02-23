@@ -20,16 +20,25 @@ def main():
     #Init data containers for GUI
     meta , net = dataMgr.CreateContainers()
     cons = consensus.Consensus()
-
-    #Init Peer Manager
-    peer_mgr = peersMgr.PeersManager( cons, meta)
-    peer_mgr.start()
-
-    #Init server 
-    serv =  serverMgr.ServerManager(peer_mgr.get_peer_Q(), meta, port)
-    serv.start()
     
-    peer_creator = serverMgr.PeerCreator(peer_mgr.get_peer_Q(), meta)
+    #Test case for easy gui work
+
+    if port == -1 :
+        print("GUI TEST MODE SELECTED") 
+        peer_mgr = peersMgr.TestPeer(cons, meta)
+        peer_mgr.start()
+        peer_creator = serverMgr.TestPeerCreator(peer_mgr.message_queue , meta)
+
+    else:
+        #Init Peer Manager
+        peer_mgr = peersMgr.PeersManager(cons, meta)
+        peer_mgr.start()
+
+        #Init server 
+        serv =  serverMgr.ServerManager(peer_mgr.get_peer_Q(), meta, port)
+        serv.start()
+    
+        peer_creator = serverMgr.PeerCreator(peer_mgr.get_peer_Q(), meta)
 
     #Init GUI
     wind = mainGui.initialize_gui(cons.vis_data.model, meta.model\

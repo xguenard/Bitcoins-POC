@@ -103,15 +103,30 @@ class PeersManager(threading.Thread):
 
     def get_meta_vis(self):
         return self.metas_infos.meta_data.model
-    
-    
-class PeersManagerTest(unittest.TestCase):
-    def setUp(self):
-        pass
 
-    def test_threads(self):
-        t = PeersManager()
+#Tests for the GUI only
+class TestPeer(threading.Thread):
+    def __init__(self, cons, meta):
+        super().__init__()
+        self.message_queue = queue.Queue()
+        self.consensus = cons
+        self.metas_infos = meta
 
+    def process_message_Q(self):
+        """
+            Processing the message queue, sending messages to all the peers
+        """
+        while not self.message_queue.empty():
+            msg = self.message_queue.get()
+            self.consensus.add(msg)
+            self.metas_infos.add( \
+                    "Sending a message '{}' to {} connected peers".format(\
+                    msg, 0))
 
-if __name__ == "__main__":
-    unittest.main()
+    def run(self):
+        while True:
+            time.sleep(0.1)
+            self.process_message_Q()
+
+    def get_mess_Q(self):
+        return self.message_queue

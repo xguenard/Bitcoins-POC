@@ -57,3 +57,12 @@ class PeerCreator:
         self.peer_queue.put((new_sock, (tcp_ip, port)))
         self.metas_info.add(( "Connected to {} at {}.".format(\
                 tcp_ip, port)))
+
+
+class TestPeerCreator:
+    def __init__(self, msg_queue, meta):
+        self.msg_queue = msg_queue
+        self.metas_info = meta
+
+    def create_peer(self, tcp_ip, port):
+        self.metas_info.add( "No peer creation in GUI TEST MODE")
